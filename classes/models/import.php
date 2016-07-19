@@ -57,6 +57,10 @@ class Markdown_Importer_Import {
 		return $this->messages;
 	}
 
+	protected function _push_message( $message ) {
+		$this->messages[] = $message;
+	}
+
 	/**
 	 * Parsing in the subdirectory and imoprting
 	 *
@@ -71,8 +75,6 @@ class Markdown_Importer_Import {
 		// .md ファイルがない場合は終了
 		// @todo
 		// .md ファイルが複数ある場合は2つめ以降を無視
-		// @todo
-		// li を echo じゃなくて $this->messages にメッセージを入れる
 
 		if ( ! preg_match( '/^\d+$/', $dir_name ) ) {
 			return false;
@@ -87,7 +89,6 @@ class Markdown_Importer_Import {
 			return false;
 		}
 
-		echo '<ul>';
 		foreach ( $files as $file ) {
 			$filename = basename( $file );
 
@@ -99,11 +100,25 @@ class Markdown_Importer_Import {
 
 			// If the file is .md, update the post from this .md
 			if ( preg_match( '/\.md$/', $filename ) ) {
-				$this->_import_the_markdown( $file, $post_id );
-				echo '<li>Import from ' . esc_html( $dir_name ) . ' / ' . esc_html( $filename ) . '</li>';
+				if ( $this->_import_the_markdown( $file, $post_id ) ) {
+					$this->_push_message(
+						sprintf(
+							__( 'Imported from %1$s/%2$s', 'markdown-importer' ),
+							$dir_name,
+							$filename
+						)
+					);
+				} else {
+					$this->_push_message(
+						sprintf(
+							__( 'Failed importing from %1$s/%2$s', 'markdown-importer' ),
+							$dir_name,
+							$filename
+						)
+					);
+				}
 			}
 		}
-		echo '</ul>';
 
 		return true;
 	}
