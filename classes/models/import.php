@@ -73,8 +73,6 @@ class Markdown_Importer_Import {
 		$files    = glob( $dir . '/*' );
 
 		// @todo
-		// .md ファイルがない場合は終了
-		// @todo
 		// .md ファイルが複数ある場合は2つめ以降を無視
 
 		if ( ! preg_match( '/^\d+$/', $dir_name ) ) {

@@ -15,5 +15,5 @@ fi
 cd master
 
 git add -A
-git commit -m "[ci skip] release branch update from travis $TRAVIS_COMMIT"
+git commit -m "[ci skip] master branch update from travis $TRAVIS_COMMIT"
 git push --quiet "https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git" master 2> /dev/null
