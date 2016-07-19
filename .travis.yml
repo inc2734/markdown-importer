@@ -1,0 +1,23 @@
+language: node_js
+sudo: false
+node_js:
+  - '4.2'
+branches:
+  only:
+    - develop
+env:
+  global:
+    - GIT_COMMITTER_NAME=travis-ci
+    - GIT_COMMITTER_EMAIL=inc@2inc.org
+    - GIT_AUTHOR_NAME=travis-ci
+    - GIT_AUTHOR_EMAIL=inc@2inc.org
+    - secure: "ts2eTfWppeONI7Znxx66ohV5E6XpCz72kN21vkrLCF/5JkjPpb0tF9IASttcg/LRWqOvEqWmQ9RTpg1bEC/tgvOosbzFOiLIQS/c4Nvoqc/EGwCPnHNseuTAZG4iAgudXjEGikq/jR8941hrAQTxgPycDoo+0hPxUctwpYugspymQOxLyQBzsFuvE3RuOybQBI6TgEyUOErMrsRUJBYpUq/mY4k6glWUhL27MO22OCiZ8p3wjTy91fowu7vh9pwNLZIMPfKCcGDn5gRX1WR7mbSk5TLG/huk3M1h0AWD8lg9Xt6d3JG0BKpaYbKo2Pu3tLoSwg2tEi1bNEeI4g4nyfjDbMDMHeGg+u70dWrMO0/In5O8UrnhF4gmcOFYStp31zJ/tRlEGDlmHelOGhRiZQxQtIewf6ng4p/9y5KibYT+U0Frmx7u0rb6m0Pzc35KnmchIsaHpPlR1s9pSpbcHbpSQ7ALx+hukL/i/XOQEdzH9Ow+gwUdDZDEuA2l/Jgsuh0fKYx8UWMwtCZZsoiKVtRU8iRAUdP6TrqXY6sMxzMJJ+fBTNWEzaTu6er7t9qRU7n03FgJFAchQ579QKLUFXNEZiLPyMDxaSOA4n783G0eRir21jm40UXMDQU/u4R9F8RH4/jY76hRkyXEor+I5Cs9Dh33xQNdAUhRI18Y9Q0="
+before_script:
+  - git clone -b master --quiet https://github.com/inc2734/markdown-importer.git master
+script:
+  - cd master
+  - ls | xargs rm -rf
+  - cd ../
+  - rsync -a --exclude=".*" --exclude="composer.json" --exclude="bin" --exclude="master" ./ ./master/
+after_success:
+  - bash ./bin/deploy.sh
