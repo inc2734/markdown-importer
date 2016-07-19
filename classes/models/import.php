@@ -68,11 +68,10 @@ class Markdown_Importer_Import {
 	 * @return bool
 	 */
 	protected function _parse_subdir( $dir ) {
+		$has_markdown_file = false;
 		$dir_name = basename( $dir );
 		$files    = glob( $dir . '/*' );
 
-		// @todo
-		// .md ファイルがない場合は終了
 		// @todo
 		// .md ファイルが複数ある場合は2つめ以降を無視
 
@@ -86,6 +85,17 @@ class Markdown_Importer_Import {
 		}
 
 		if ( ! $files ) {
+			return false;
+		}
+
+		foreach ( $files as $file ) {
+			$filename = basename( $file );
+			if ( preg_match( '/\.md$/', $filename ) ) {
+				$has_markdown_file = true;
+				break;
+			}
+		}
+		if ( ! $has_markdown_file ) {
 			return false;
 		}
 
@@ -210,11 +220,21 @@ class Markdown_Importer_Import {
 			return;
 		}
 
-		foreach ( glob( $dir . '/*', GLOB_ONLYDIR ) as $file ) {
+		$files = glob( $dir . '/{*,.*}', GLOB_ONLYDIR + GLOB_BRACE );
+		foreach ( $files as $file ) {
+			$filename = basename( $file );
+			if ( $filename === '.' || $filename === '..' ) {
+				continue;
+			}
 			$this->_rmdir( $file );
 		}
 
-		foreach ( glob( $dir . '/*' ) as $file ) {
+		$files = glob( $dir . '/{*,.*}', GLOB_BRACE );
+		foreach ( $files as $file ) {
+			$filename = basename( $file );
+			if ( $filename === '.' || $filename === '..' ) {
+				continue;
+			}
 			unlink( $file );
 		}
 

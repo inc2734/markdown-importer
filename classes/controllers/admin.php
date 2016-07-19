@@ -101,7 +101,8 @@ class Markdown_Importer_Admin_Controller {
 			<?php
 			check_admin_referer( $this->action );
 
-			if ( $this->Import->import() ) {
+			$imported_count = $this->Import->import();
+			if ( $imported_count ) {
 				$messages = $this->Import->get_messages();
 				if ( $messages ) {
 					echo '<ul>';
