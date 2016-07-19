@@ -103,6 +103,13 @@ class Markdown_Importer_Admin_Controller {
 
 			if ( $this->Import->import() ) {
 				$messages = $this->Import->get_messages();
+				if ( $messages ) {
+					echo '<ul>';
+					foreach ( $messages as $message ) {
+						printf( '<li>%1$s</li>', esc_html( $message ) );
+					}
+					echo '</ul>';
+				}
 				$this->_display_complete_message();
 			} else {
 				$this->_display_no_imported_message();
