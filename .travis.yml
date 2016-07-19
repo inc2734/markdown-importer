@@ -17,6 +17,7 @@ before_script:
 script:
   - cd master
   - ls | xargs rm -rf
+  - rm -rf .[^.] .??*
   - cd ../
   - rsync -a --exclude=".*" --exclude="composer.json" --exclude="bin" --exclude="master" ./ ./master/
 after_success:
