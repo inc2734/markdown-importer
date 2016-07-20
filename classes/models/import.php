@@ -69,11 +69,9 @@ class Markdown_Importer_Import {
 	 */
 	protected function _parse_subdir( $dir ) {
 		$has_markdown_file = false;
+		$is_imported_markdown_file = false;
 		$dir_name = basename( $dir );
 		$files    = glob( $dir . '/*' );
-
-		// @todo
-		// .md ファイルが複数ある場合は2つめ以降を無視
 
 		if ( ! preg_match( '/^\d+$/', $dir_name ) ) {
 			return false;
@@ -119,13 +117,16 @@ class Markdown_Importer_Import {
 						)
 					);
 				} else {
-					$this->_push_message(
-						sprintf(
-							__( 'Failed importing from %1$s/%2$s', 'markdown-importer' ),
-							$dir_name,
-							$filename
-						)
-					);
+					if ( ! $is_imported_markdown_file ) {
+						$this->_push_message(
+							sprintf(
+								__( 'Failed importing from %1$s/%2$s', 'markdown-importer' ),
+								$dir_name,
+								$filename
+							)
+						);
+						$is_imported_markdown_file = true;
+					}
 				}
 			}
 		}
