@@ -53,10 +53,21 @@ class Markdown_Importer_Import {
 		return $import_count;
 	}
 
+	/**
+	 * Return messages
+	 *
+	 * @return array $this->messages
+	 */
 	public function get_messages() {
 		return $this->messages;
 	}
 
+	/**
+	 * Push message to $this->messages
+	 *
+	 * @param string $message
+	 * @return void
+	 */
 	protected function _push_message( $message ) {
 		$this->messages[] = $message;
 	}
