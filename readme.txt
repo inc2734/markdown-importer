@@ -12,7 +12,7 @@ Importing posts from markdown files.
 
 == Description ==
 
-Importing posts from markdown files.
+Importing posts from markdown files. When importing, to convert the markdown image to html image tag.
 
 == Installation ==
 
