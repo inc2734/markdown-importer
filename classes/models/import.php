@@ -84,29 +84,21 @@ class Markdown_Importer_Import {
 		$dir_name = basename( $dir );
 		$files    = glob( $dir . '/*' );
 
-		if ( ! preg_match( '/^\d+$/', $dir_name ) ) {
-			return false;
-		}
-		$post_id = $dir_name;
-		$_post   = get_post( $post_id );
-		if ( ! $_post ) {
-			return false;
-		}
-
 		if ( ! $files ) {
 			return false;
 		}
 
-		foreach ( $files as $file ) {
-			$filename = basename( $file );
-			if ( preg_match( '/\.md$/', $filename ) ) {
-				$has_markdown_file = true;
-				break;
-			}
+		$_post = $this->_get_post_by_dir_name( $dir_name );
+		if ( ! $_post ) {
+			return false;
 		}
+
+		$has_markdown_file = $this->_has_markdown_file( $files );
 		if ( ! $has_markdown_file ) {
 			return false;
 		}
+
+		$post_id = $dir_name;
 
 		foreach ( $files as $file ) {
 			$filename = basename( $file );
@@ -143,6 +135,41 @@ class Markdown_Importer_Import {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Getting WP_Post by directory name
+	 *
+	 * @param string $dir_name
+	 * @return WP_Post|false
+	 */
+	protected function _get_post_by_dir_name( $dir_name ) {
+		if ( ! preg_match( '/^\d+$/', $dir_name ) ) {
+			return false;
+		}
+
+		$_post = get_post( $dir_name );
+		if ( ! $_post ) {
+			return false;
+		}
+
+		return $_post;
+	}
+
+	/**
+	 * Whether to have markdown file
+	 *
+	 * @param array $files Array of filepath
+	 * @return boolean
+	 */
+	protected function _has_markdown_file( $files ) {
+		foreach ( $files as $file ) {
+			$filename = basename( $file );
+			if ( preg_match( '/\.md$/', $filename ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -199,15 +226,8 @@ class Markdown_Importer_Import {
 			return false;
 		}
 
-		$time = get_the_time( 'Y/m', $post_id );
-		$wp_upload_dir = wp_upload_dir( $time, $post_id );
-		$upload_url    = untrailingslashit( $wp_upload_dir['url'] );
-
-		$content = preg_replace(
-			'/\!\[(.*?)\]\((.+?)\)/sm',
-			'<img src="' . esc_url( $upload_url ) . '/$2" alt="$1" />',
-			$content
-		);
+		$Converting_Image = new Markdown_Importer_Converting_Image( $post_id, $content );
+		$content = $Converting_Image->convert();
 
 		$_post = array(
 			'ID'           => $post_id,

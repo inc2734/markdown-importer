@@ -3,7 +3,7 @@
  * Plugin name: Markdown importer
  * Plugin URI:
  * Description: Importing posts from markdown files.
- * Version: 0.1.0
+ * Version: 0.1.1
  * Author: inc2734
  * Author URI: http://2inc.org
  * Created: July 19, 2016
@@ -22,6 +22,7 @@ class Markdown_Importer {
 	public function plugins_loaded() {
 		require_once plugin_dir_path( __FILE__ ) . 'classes/controllers/admin.php';
 		require_once plugin_dir_path( __FILE__ ) . 'classes/models/import.php';
+		require_once plugin_dir_path( __FILE__ ) . 'classes/models/converting-image.php';
 		new Markdown_Importer_Admin_Controller();
 	}
 }
