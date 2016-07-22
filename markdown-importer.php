@@ -3,7 +3,7 @@
  * Plugin name: Markdown importer
  * Plugin URI:
  * Description: Importing posts from markdown files.
- * Version: 0.1.0
+ * Version: 0.1.1
  * Author: inc2734
  * Author URI: http://2inc.org
  * Created: July 19, 2016
