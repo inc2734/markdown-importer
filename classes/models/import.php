@@ -199,15 +199,8 @@ class Markdown_Importer_Import {
 			return false;
 		}
 
-		$time = get_the_time( 'Y/m', $post_id );
-		$wp_upload_dir = wp_upload_dir( $time, $post_id );
-		$upload_url    = untrailingslashit( $wp_upload_dir['url'] );
-
-		$content = preg_replace(
-			'/\!\[(.*?)\]\((.+?)\)/sm',
-			'<img src="' . esc_url( $upload_url ) . '/$2" alt="$1" />',
-			$content
-		);
+		$Converting_Image = new Markdown_Importer_Converting_Image( $post_id, $content );
+		$content = $Converting_Image->convert();
 
 		$_post = array(
 			'ID'           => $post_id,

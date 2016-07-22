@@ -22,6 +22,7 @@ class Markdown_Importer {
 	public function plugins_loaded() {
 		require_once plugin_dir_path( __FILE__ ) . 'classes/controllers/admin.php';
 		require_once plugin_dir_path( __FILE__ ) . 'classes/models/import.php';
+		require_once plugin_dir_path( __FILE__ ) . 'classes/models/converting-image.php';
 		new Markdown_Importer_Admin_Controller();
 	}
 }
