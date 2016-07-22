@@ -18,6 +18,6 @@ script:
   - cd master
   - ls | xargs rm -rf
   - cd ../
-  - rsync -a --exclude=".*" --exclude="composer.json" --exclude="bin" --exclude="master" ./ ./master/
+  - rsync -a --exclude=".*" --exclude="bin" --exclude="master" ./ ./master/
 after_success:
   - bash ./bin/deploy.sh
