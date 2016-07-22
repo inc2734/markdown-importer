@@ -2,10 +2,10 @@
 class Markdown_Importer_Converting_Image {
 
 	/**
-	 * The attachment ID
+	 * The Post ID
 	 * @var int
 	 */
-	protected $attachment_id;
+	protected $post_id;
 
 	/**
 	 * Markdown content
@@ -14,12 +14,18 @@ class Markdown_Importer_Converting_Image {
 	protected $content;
 
 	/**
-	 * @param int $attachment_id
+	 * The upload directory url of the attachment.
+	 * @var string
+	 */
+	protected $upload_url;
+
+	/**
+	 * @param int $post_id
 	 * @param string $content
 	 */
-	public function __construct( $attachment_id, $content ) {
-		$this->attachment_id = $attachment_id;
-		$this->content       = $content;
+	public function __construct( $post_id, $content ) {
+		$this->post_id = $post_id;
+		$this->content = $content;
 	}
 
 	/**
@@ -28,34 +34,31 @@ class Markdown_Importer_Converting_Image {
 	 * @return string
 	 */
 	public function convert() {
+		$time             = get_the_time( 'Y/m', $this->post_id );
+		$wp_upload_dir    = wp_upload_dir( $time, $this->post_id );
+		$this->upload_url = untrailingslashit( $wp_upload_dir['url'] );
+
 		return preg_replace_callback(
 			'/\!\[(.*?)\]\((.+?)\)/sm',
 			function( $matches ) {
-				$attachment = get_page_by_title( $matches[2], 'OBJECT', 'attachment' );
-				$full  = $this->get_attachment_url( $attachment->ID, 'full' );
-				$large = $this->get_attachment_url( $attachment->ID, 'large' );
+				$attachment_url = $this->upload_url . '/' . $matches[2];
+				$attachment_id  = attachment_url_to_postid( $attachment_url );
+				$full           = wp_get_attachment_image_url( $attachment_id, 'full' );
+				$large          = wp_get_attachment_image_url( $attachment_id, 'large' );
+
+				if ( ! $full || ! $large ) {
+					return;
+				}
+
 				return sprintf(
-					'<a href="%1$s"><img src="%2$s" alt="%3$s" /></a>',
+					'<a class="markdown-importer-image-link" href="%1$s"><img class="size-large wp-image-%2$d markdown-importer-image" src="%3$s" alt="%4$s" /></a>',
 					esc_url( $full ),
+					esc_attr( $attachment_id ),
 					esc_url( $large ),
 					esc_attr( $matches[1] )
 				);
 			},
 			$this->content
 		);
-	}
-
-	/**
-	 * Return attachment url
-	 *
-	 * @param int $attachment_id
-	 * @param string attachment size
-	 * @return string
-	 */
-	protected function get_attachment_url( $attachment_id, $size ) {
-		$src = wp_get_attachment_image_src( $attachment_id, $size );
-		if ( ! empty( $src[0] ) ) {
-			return $src[0];
-		}
 	}
 }
