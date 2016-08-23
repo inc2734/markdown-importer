@@ -185,7 +185,8 @@ class Markdown_Importer_Import {
 		$time = get_the_time( 'Y/m', $post_id );
 		$wp_upload_dir = wp_upload_dir( $time, $post_id );
 		$upload_dir    = untrailingslashit( $wp_upload_dir['path'] );
-		$filename      = basename( $file );
+		$pathinfo      = pathinfo( $file );
+		$filename      = sha1( basename( $file ) ) . '.' . $pathinfo['extension'];
 		$new_filepath  = $upload_dir . '/' . $filename;
 
 		if ( file_exists( $new_filepath ) ) {
@@ -197,7 +198,7 @@ class Markdown_Importer_Import {
 		$wp_check_filetype = wp_check_filetype( $new_filepath );
 		$attachment = array(
 			'post_mime_type' => $wp_check_filetype['type'],
-			'post_title'     => $filename,
+			'post_title'     => basename( $file ),
 			'post_status'    => 'inherit',
 			'post_content'   => __( 'Uploaded from the Markdown Importer', 'markdown-importer' ),
 		);

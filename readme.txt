@@ -2,9 +2,9 @@
 Contributors: inc2734, megane9988, toro_unit
 Donate link: http://www.amazon.co.jp/registry/wishlist/39ANKRNSTNW40
 Tags: plugin, importer, markdown
-Requires at least: 4.5
-Tested up to: 4.5.3
-Stable tag: 0.1.2
+Requires at least: 4.5.3
+Tested up to: 4.6.0
+Stable tag: 0.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -25,6 +25,9 @@ Importing posts from markdown files. When importing, to convert the markdown ima
 == Screenshots ==
 
 == Changelog ==
+
+= 0.1.3 =
+* Support multibyte filename of image. The filename is hashed string.
 
 = 0.1.2 =
 * Fixed bug for using comporser

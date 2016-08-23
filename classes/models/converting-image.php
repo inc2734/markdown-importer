@@ -41,7 +41,9 @@ class Markdown_Importer_Converting_Image {
 		return preg_replace_callback(
 			'/\!\[(.*?)\]\((.+?)\)/sm',
 			function( $matches ) {
-				$attachment_url = $this->upload_url . '/' . $matches[2];
+				$pathinfo       = pathinfo( $matches[2] );
+				$filename       = sha1( $matches[2] ) . '.' . $pathinfo['extension'];
+				$attachment_url = $this->upload_url . '/' . $filename;
 				$attachment_id  = attachment_url_to_postid( $attachment_url );
 				$full           = wp_get_attachment_image_url( $attachment_id, 'full' );
 				$large          = wp_get_attachment_image_url( $attachment_id, 'large' );
