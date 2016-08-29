@@ -28,6 +28,7 @@ Importing posts from markdown files. When importing, to convert the markdown ima
 
 = 0.1.3 =
 * Support multibyte filename of image. The filename is hashed string.
+* Fixed unicode normalization bug.
 
 = 0.1.2 =
 * Fixed bug for using comporser
