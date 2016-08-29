@@ -111,26 +111,37 @@ class Markdown_Importer_Import {
 
 			// If the file is .md, update the post from this .md
 			if ( preg_match( '/\.md$/', $filename ) ) {
-				if ( $this->_import_the_markdown( $file, $post_id ) ) {
+				if ( $is_imported_markdown_file ) {
 					$this->_push_message(
 						sprintf(
-							__( 'Imported from %1$s/%2$s', 'markdown-importer' ),
+							__( 'Markdown file is imported per post is the only one. %1$s/%2$s', 'markdown-importer' ),
 							$dir_name,
 							$filename
 						)
 					);
-				} else {
-					if ( ! $is_imported_markdown_file ) {
-						$this->_push_message(
-							sprintf(
-								__( 'Failed importing from %1$s/%2$s', 'markdown-importer' ),
-								$dir_name,
-								$filename
-							)
-						);
-						$is_imported_markdown_file = true;
-					}
+					continue;
 				}
+
+				if ( ! $this->_import_the_markdown( $file, $post_id ) ) {
+					$this->_push_message(
+						sprintf(
+							__( 'Failed importing from %1$s/%2$s', 'markdown-importer' ),
+							$dir_name,
+							$filename
+						)
+					);
+					continue;
+				}
+
+				$this->_push_message(
+					sprintf(
+						__( 'Imported from %1$s/%2$s', 'markdown-importer' ),
+						$dir_name,
+						$filename
+					)
+				);
+
+				$is_imported_markdown_file = true;
 			}
 		}
 
