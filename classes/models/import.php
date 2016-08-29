@@ -194,11 +194,13 @@ class Markdown_Importer_Import {
 		require_once( ABSPATH . 'wp-admin' . '/includes/media.php' );
 		require_once( ABSPATH . 'wp-admin' . '/includes/image.php' );
 		$time = get_the_time( 'Y/m', $post_id );
-		$wp_upload_dir = wp_upload_dir( $time, $post_id );
-		$upload_dir    = untrailingslashit( $wp_upload_dir['path'] );
-		$pathinfo      = pathinfo( $file );
-		$filename      = sha1( basename( $file ) ) . '.' . $pathinfo['extension'];
-		$new_filepath  = $upload_dir . '/' . $filename;
+		$wp_upload_dir         = wp_upload_dir( $time, $post_id );
+		$upload_dir            = untrailingslashit( $wp_upload_dir['path'] );
+		$pathinfo              = pathinfo( $file );
+		$Unicode_Normalization = new Markdown_Importer_Unicode_Normalization( basename( $file ) );
+		$filename              = $Unicode_Normalization->convert();
+		$filename              = sha1( $filename ) . '.' . $pathinfo['extension'];
+		$new_filepath          = $upload_dir . '/' . $filename;
 
 		if ( file_exists( $new_filepath ) ) {
 			return false;

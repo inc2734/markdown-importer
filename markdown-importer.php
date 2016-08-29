@@ -15,6 +15,8 @@
  */
 class Markdown_Importer {
 
+	public static $map;
+
 	public function __construct() {
 		add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ) );
 	}
@@ -23,6 +25,7 @@ class Markdown_Importer {
 		require_once plugin_dir_path( __FILE__ ) . 'classes/controllers/admin.php';
 		require_once plugin_dir_path( __FILE__ ) . 'classes/models/import.php';
 		require_once plugin_dir_path( __FILE__ ) . 'classes/models/converting-image.php';
+		require_once plugin_dir_path( __FILE__ ) . 'classes/models/unicode-normalization.php';
 		new Markdown_Importer_Admin_Controller();
 	}
 }
