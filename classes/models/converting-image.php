@@ -41,12 +41,14 @@ class Markdown_Importer_Converting_Image {
 		return preg_replace_callback(
 			'/\!\[(.*?)\]\((.+?)\)/sm',
 			function( $matches ) {
-				$pathinfo       = pathinfo( $matches[2] );
-				$filename       = sha1( $matches[2] ) . '.' . $pathinfo['extension'];
-				$attachment_url = $this->upload_url . '/' . $filename;
-				$attachment_id  = attachment_url_to_postid( $attachment_url );
-				$full           = wp_get_attachment_image_url( $attachment_id, 'full' );
-				$large          = wp_get_attachment_image_url( $attachment_id, 'large' );
+				$pathinfo              = pathinfo( $matches[2] );
+				$Unicode_Normalization = new Markdown_Importer_Unicode_Normalization( $matches[2] );
+				$filename              = $Unicode_Normalization->convert();
+				$filename              = sha1( $filename ) . '.' . $pathinfo['extension'];
+				$attachment_url        = $this->upload_url . '/' . $filename;
+				$attachment_id         = attachment_url_to_postid( $attachment_url );
+				$full                  = wp_get_attachment_image_url( $attachment_id, 'full' );
+				$large                 = wp_get_attachment_image_url( $attachment_id, 'large' );
 
 				if ( ! $full || ! $large ) {
 					return;
