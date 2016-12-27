@@ -3,7 +3,7 @@ Contributors: inc2734, megane9988, toro_unit
 Donate link: http://www.amazon.co.jp/registry/wishlist/39ANKRNSTNW40
 Tags: plugin, importer, markdown
 Requires at least: 4.5.3
-Tested up to: 4.6.0
+Tested up to: 4.7.0
 Stable tag: 0.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
