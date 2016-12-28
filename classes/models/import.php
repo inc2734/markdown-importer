@@ -53,10 +53,21 @@ class Markdown_Importer_Import {
 		return $import_count;
 	}
 
+	/**
+	 * Return messages
+	 *
+	 * @return array $this->messages
+	 */
 	public function get_messages() {
 		return $this->messages;
 	}
 
+	/**
+	 * Push message to $this->messages
+	 *
+	 * @param string $message
+	 * @return void
+	 */
 	protected function _push_message( $message ) {
 		$this->messages[] = $message;
 	}
@@ -68,26 +79,26 @@ class Markdown_Importer_Import {
 	 * @return bool
 	 */
 	protected function _parse_subdir( $dir ) {
+		$has_markdown_file = false;
+		$is_imported_markdown_file = false;
 		$dir_name = basename( $dir );
 		$files    = glob( $dir . '/*' );
-
-		// @todo
-		// .md ファイルがない場合は終了
-		// @todo
-		// .md ファイルが複数ある場合は2つめ以降を無視
-
-		if ( ! preg_match( '/^\d+$/', $dir_name ) ) {
-			return false;
-		}
-		$post_id = $dir_name;
-		$_post   = get_post( $post_id );
-		if ( ! $_post ) {
-			return false;
-		}
 
 		if ( ! $files ) {
 			return false;
 		}
+
+		$_post = $this->_get_post_by_dir_name( $dir_name );
+		if ( ! $_post ) {
+			return false;
+		}
+
+		$has_markdown_file = $this->_has_markdown_file( $files );
+		if ( ! $has_markdown_file ) {
+			return false;
+		}
+
+		$post_id = $dir_name;
 
 		foreach ( $files as $file ) {
 			$filename = basename( $file );
@@ -100,15 +111,18 @@ class Markdown_Importer_Import {
 
 			// If the file is .md, update the post from this .md
 			if ( preg_match( '/\.md$/', $filename ) ) {
-				if ( $this->_import_the_markdown( $file, $post_id ) ) {
+				if ( $is_imported_markdown_file ) {
 					$this->_push_message(
 						sprintf(
-							__( 'Imported from %1$s/%2$s', 'markdown-importer' ),
+							__( 'Markdown file is imported per post is the only one. %1$s/%2$s', 'markdown-importer' ),
 							$dir_name,
 							$filename
 						)
 					);
-				} else {
+					continue;
+				}
+
+				if ( ! $this->_import_the_markdown( $file, $post_id ) ) {
 					$this->_push_message(
 						sprintf(
 							__( 'Failed importing from %1$s/%2$s', 'markdown-importer' ),
@@ -116,11 +130,57 @@ class Markdown_Importer_Import {
 							$filename
 						)
 					);
+					continue;
 				}
+
+				$this->_push_message(
+					sprintf(
+						__( 'Imported from %1$s/%2$s', 'markdown-importer' ),
+						$dir_name,
+						$filename
+					)
+				);
+
+				$is_imported_markdown_file = true;
 			}
 		}
 
 		return true;
+	}
+
+	/**
+	 * Getting WP_Post by directory name
+	 *
+	 * @param string $dir_name
+	 * @return WP_Post|false
+	 */
+	protected function _get_post_by_dir_name( $dir_name ) {
+		if ( ! preg_match( '/^\d+$/', $dir_name ) ) {
+			return false;
+		}
+
+		$_post = get_post( $dir_name );
+		if ( ! $_post ) {
+			return false;
+		}
+
+		return $_post;
+	}
+
+	/**
+	 * Whether to have markdown file
+	 *
+	 * @param array $files Array of filepath
+	 * @return boolean
+	 */
+	protected function _has_markdown_file( $files ) {
+		foreach ( $files as $file ) {
+			$filename = basename( $file );
+			if ( preg_match( '/\.md$/', $filename ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -136,10 +196,17 @@ class Markdown_Importer_Import {
 		$time = get_the_time( 'Y/m', $post_id );
 		$wp_upload_dir = wp_upload_dir( $time, $post_id );
 		$upload_dir    = untrailingslashit( $wp_upload_dir['path'] );
-		$filename      = basename( $file );
+		$filename      = Markdown_Importer::generate_normalization_filename( $file );
 		$new_filepath  = $upload_dir . '/' . $filename;
 
 		if ( file_exists( $new_filepath ) ) {
+			$this->_push_message(
+				sprintf(
+					__( 'Failed importing image %1$s. Already exists', 'markdown-importer' ),
+					$file
+				)
+			);
+
 			return false;
 		}
 
@@ -148,7 +215,7 @@ class Markdown_Importer_Import {
 		$wp_check_filetype = wp_check_filetype( $new_filepath );
 		$attachment = array(
 			'post_mime_type' => $wp_check_filetype['type'],
-			'post_title'     => $filename,
+			'post_title'     => basename( $file ),
 			'post_status'    => 'inherit',
 			'post_content'   => __( 'Uploaded from the Markdown Importer', 'markdown-importer' ),
 		);
@@ -160,6 +227,15 @@ class Markdown_Importer_Import {
 
 		$attach_data = wp_generate_attachment_metadata( $attach_id, $new_filepath );
 		wp_update_attachment_metadata( $attach_id, $attach_data );
+
+		$this->_push_message(
+			sprintf(
+				__( 'Imported image from %1$s to %2$s', 'markdown-importer' ),
+				$file,
+				$new_filepath
+			)
+		);
+
 		return true;
 	}
 
@@ -177,15 +253,8 @@ class Markdown_Importer_Import {
 			return false;
 		}
 
-		$time = get_the_time( 'Y/m', $post_id );
-		$wp_upload_dir = wp_upload_dir( $time, $post_id );
-		$upload_url    = untrailingslashit( $wp_upload_dir['url'] );
-
-		$content = preg_replace(
-			'/\!\[(.*?)\]\((.+?)\)/sm',
-			'<img src="' . esc_url( $upload_url ) . '/$2" alt="$1" />',
-			$content
-		);
+		$Converting_Image = new Markdown_Importer_Converting_Image( $post_id, $content );
+		$content = $Converting_Image->convert();
 
 		$_post = array(
 			'ID'           => $post_id,
@@ -210,11 +279,21 @@ class Markdown_Importer_Import {
 			return;
 		}
 
-		foreach ( glob( $dir . '/*', GLOB_ONLYDIR ) as $file ) {
+		$files = glob( $dir . '/{*,.*}', GLOB_ONLYDIR + GLOB_BRACE );
+		foreach ( $files as $file ) {
+			$filename = basename( $file );
+			if ( $filename === '.' || $filename === '..' ) {
+				continue;
+			}
 			$this->_rmdir( $file );
 		}
 
-		foreach ( glob( $dir . '/*' ) as $file ) {
+		$files = glob( $dir . '/{*,.*}', GLOB_BRACE );
+		foreach ( $files as $file ) {
+			$filename = basename( $file );
+			if ( $filename === '.' || $filename === '..' ) {
+				continue;
+			}
 			unlink( $file );
 		}
 

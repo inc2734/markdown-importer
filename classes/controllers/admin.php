@@ -89,27 +89,20 @@ class Markdown_Importer_Admin_Controller {
 	}
 
 	/**
-	 * Dsiplaying complete page
+	 * Displaying complete page
 	 *
 	 * @return voide
 	 */
 	protected function _display_complete_page() {
-		check_admin_referer( $this->action );
 		?>
 		<div class="wrap">
 			<h2><?php echo esc_html( $this->page_title ); ?></h2>
 			<?php
 			check_admin_referer( $this->action );
 
-			if ( $this->Import->import() ) {
-				$messages = $this->Import->get_messages();
-				if ( $messages ) {
-					echo '<ul>';
-					foreach ( $messages as $message ) {
-						printf( '<li>%1$s</li>', esc_html( $message ) );
-					}
-					echo '</ul>';
-				}
+			$imported_count = $this->Import->import();
+			$this->_display_import_messages();
+			if ( $imported_count ) {
 				$this->_display_complete_message();
 			} else {
 				$this->_display_no_imported_message();
@@ -120,7 +113,23 @@ class Markdown_Importer_Admin_Controller {
 	}
 
 	/**
-	 * Dsiplaying complete message
+	 * Displaying messages from Import object
+	 *
+	 * @return void
+	 */
+	protected function _display_import_messages() {
+		$messages = $this->Import->get_messages();
+		if ( $messages ) {
+			echo '<ul>';
+			foreach ( $messages as $message ) {
+				printf( '<li>%1$s</li>', esc_html( $message ) );
+			}
+			echo '</ul>';
+		}
+	}
+
+	/**
+	 * Displaying complete message
 	 *
 	 * @return void
 	 */
@@ -133,7 +142,7 @@ class Markdown_Importer_Admin_Controller {
 	}
 
 	/**
-	 * Dsiplaying no imported message
+	 * Displaying no imported message
 	 *
 	 * @return void
 	 */
