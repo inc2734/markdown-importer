@@ -39,7 +39,7 @@ class Markdown_Importer_Converting_Image {
 		$this->upload_url = untrailingslashit( $wp_upload_dir['url'] );
 
 		return preg_replace_callback(
-			'/\!\[(.*?)\]\((.+?)\)/sm',
+			'/\!\[(.*?)\]\((.+?\.(jpg|jpeg|gif|png|bmp|svg))\)/',
 			function( $matches ) {
 				$filename       = Markdown_Importer::generate_normalization_filename( $matches[2] );
 				$attachment_url = $this->upload_url . '/' . $filename;

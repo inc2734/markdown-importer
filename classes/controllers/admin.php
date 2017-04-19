@@ -122,7 +122,11 @@ class Markdown_Importer_Admin_Controller {
 		if ( $messages ) {
 			echo '<ul>';
 			foreach ( $messages as $message ) {
-				printf( '<li>%1$s</li>', esc_html( $message ) );
+				printf(
+					'<li><div class="notice notice-%1$s"><p>%2$s</p></div></li>',
+					esc_attr( $message['type'] ),
+					wp_kses_post( $message['message'] )
+				);
 			}
 			echo '</ul>';
 		}
