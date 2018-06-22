@@ -3,11 +3,11 @@
  * Plugin name: Markdown importer
  * Plugin URI:
  * Description: Importing posts from markdown files.
- * Version: 0.3.0
+ * Version: 0.3.1
  * Author: inc2734
  * Author URI: https://2inc.org
  * Created: July 19, 2016
- * Modified: April 19, 2017
+ * Modified: June 22, 2018
  * Text Domain: markdown-importer
  * Domain Path: /languages
  * License: GPLv2 or later
@@ -33,9 +33,10 @@ class Markdown_Importer {
 	 * When filename has non half-width character, filename converted with sha1.
 	 *
 	 * @param string $filename
+	 * @param int $post_id
 	 * @return string
 	 */
-	public static function generate_normalization_filename( $filename ) {
+	public static function generate_normalization_filename( $filename, $post_id = null ) {
 		$pathinfo              = pathinfo( $filename );
 		$Unicode_Normalization = new Markdown_Importer_Unicode_Normalization( basename( $filename ) );
 		$filename              = $Unicode_Normalization->convert();
@@ -43,6 +44,11 @@ class Markdown_Importer {
 		if ( ! preg_match( '/^[a-zA-Z0-9_-]+\.' . $pathinfo['extension'] . '$/', $filename ) ) {
 			$filename = sha1( $filename ) . '.' . $pathinfo['extension'];
 		}
+
+		if ( $post_id ) {
+			$filename = $post_id . '-' . $filename;
+		}
+
 		return $filename;
 	}
 }

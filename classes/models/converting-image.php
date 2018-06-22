@@ -41,7 +41,7 @@ class Markdown_Importer_Converting_Image {
 		return preg_replace_callback(
 			'/\!\[(.*?)\]\((.+?\.(jpg|jpeg|gif|png|bmp|svg))\)/',
 			function( $matches ) {
-				$filename       = Markdown_Importer::generate_normalization_filename( $matches[2] );
+				$filename       = Markdown_Importer::generate_normalization_filename( $matches[2], $this->post_id );
 				$attachment_url = $this->upload_url . '/' . $filename;
 				$attachment_id  = attachment_url_to_postid( $attachment_url );
 				$full           = wp_get_attachment_image_url( $attachment_id, 'full' );

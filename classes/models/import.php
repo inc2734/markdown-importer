@@ -227,10 +227,11 @@ class Markdown_Importer_Import {
 	protected function _import_the_image( $file, $post_id ) {
 		require_once( ABSPATH . 'wp-admin' . '/includes/media.php' );
 		require_once( ABSPATH . 'wp-admin' . '/includes/image.php' );
+
 		$time = get_the_time( 'Y/m', $post_id );
 		$wp_upload_dir = wp_upload_dir( $time, $post_id );
 		$upload_dir    = untrailingslashit( $wp_upload_dir['path'] );
-		$filename      = Markdown_Importer::generate_normalization_filename( $file );
+		$filename      = Markdown_Importer::generate_normalization_filename( $file, $post_id );
 		$new_filepath  = $upload_dir . '/' . $filename;
 
 		if ( ! $this->_is_image( $file ) ) {
